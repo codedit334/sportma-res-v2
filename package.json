@@ -11,7 +11,8 @@
   "dependencies": {
     "vue": "^3.2.47",
     "vue-cal": "^4.10.0",
-    "vue-router": "^4.1.6"
+    "vue-router": "^4.1.6",
+    "vuetify": "^3.7.3"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.1.0",
