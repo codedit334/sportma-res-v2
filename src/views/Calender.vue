@@ -317,6 +317,12 @@ export default {
         let eventClass = "";
         let clickable = false;
         let eventContent = "";
+        let duration = 60; // Default duration
+
+        // Check if event.split contains the word "padel"
+        if (event.split.toLowerCase().includes("padel")) {
+          duration = 90; // Set duration to 90 if "padel" is found
+        }
 
         // Conditional content based on user type
         if (this.selectedUser === "sportma") {
@@ -334,7 +340,7 @@ export default {
           clickable = true;
         }
 
-        this.$refs.vuecal2.createEvent(event.date, 60, {
+        this.$refs.vuecal2.createEvent(event.date, duration, {
           id: uuidv4(),
           title: `Nouvelle Reservation`,
           class: eventClass,
