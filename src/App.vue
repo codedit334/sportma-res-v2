@@ -1,7 +1,10 @@
 <template>
   <div class="app">
     <sidebar />
-    <router-view />
+
+    <div class="app-content" style="position: relative; left: calc(2rem + 32px)">
+      <router-view />
+    </div>
   </div>
 </template>
 
