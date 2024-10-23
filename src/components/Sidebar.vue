@@ -27,14 +27,6 @@
           </span>
           <span class="text">Calendrier</span>
         </router-link>
-        <router-link class="button" to="/team">
-          <span class="material-icons material-symbols-outlined">group</span>
-          <span class="text">Team</span>
-        </router-link>
-        <router-link class="button" to="/contact">
-          <span class="material-icons material-symbols-outlined">email</span>
-          <span class="text">Contact</span>
-        </router-link>
       </div>
       <div class="flex"></div>
       <div class="menu">
