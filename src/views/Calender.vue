@@ -72,6 +72,7 @@
       :on-event-dblclick="onEventClick"
       :overlaps-per-time-step="overlapsPerTimeStep"
       :min-event-width="minEventWidth"
+      @event-create="onEventCreate"
     >
       <template #split-label="{ split, view }">
         <strong :style="`color: ${split.color}`">{{ split.label }}</strong>
@@ -136,6 +137,37 @@ export default {
     this.updateSplitDays(); // Initialize splitDays on mount
   },
   methods: {
+    logEvents(event, data) {
+      console.log(event, data);
+    },
+    onEventCreate(newEvent) {
+      // Adjust start and end times to nearest 30-minute interval
+      newEvent.start = this.snapToNearest30(newEvent.start);
+      newEvent.end = this.snapToNearest30(newEvent.end);
+
+      // Now add the adjusted event to the calendar
+      this.events.push(newEvent);
+    },
+
+    snapToNearest30(date) {
+      const d = new Date(date);
+      const minutes = d.getMinutes();
+
+      if (minutes < 15) {
+        // Snap to the start of the hour
+        d.setMinutes(0);
+      } else if (minutes >= 15 && minutes < 45) {
+        // Snap to half-past the hour
+        d.setMinutes(30);
+      } else {
+        // Snap to the start of the next hour
+        d.setMinutes(0);
+        d.setHours(d.getHours() + 1);
+      }
+
+      d.setSeconds(0, 0); // Reset seconds and milliseconds
+      return d;
+    },
     handleInput(event) {
       this.selectedStatus = event.target.value;
       this.selectedEvent.class = event.target.value + "-event";
