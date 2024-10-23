@@ -3,7 +3,7 @@
     <v-row>
       <!-- Reservations Card -->
       <v-col cols="12" md="4">
-        <v-card class="pa-3 card-hover" color="primary" dark>
+        <v-card class="pa-3 card-hover modern-card reservations-card" color="primary" dark>
           <v-card-title>
             <v-icon left>event</v-icon>
             Reservations
@@ -19,7 +19,7 @@
 
       <!-- Cancellations Card -->
       <v-col cols="12" md="4">
-        <v-card class="pa-3 card-hover" color="error" dark>
+        <v-card class="pa-3 card-hover modern-card cancellations-card" color="error" dark>
           <v-card-title>
             <v-icon left>cancel</v-icon>
             Cancellations
@@ -35,7 +35,7 @@
 
       <!-- Income Card -->
       <v-col cols="12" md="4">
-        <v-card class="pa-3 card-hover" color="success" dark>
+        <v-card class="pa-3 card-hover modern-card income-card" color="success" dark>
           <v-card-title>
             <v-icon left>attach_money</v-icon>
             Income
@@ -59,8 +59,7 @@
               v-model="selectedTimeFrame"
               :items="timeFrameOptions"
               label="Select Time Frame"
-              v-on:change="updateChartData"
-              @update:modelValue="updateChartData"
+              @change="updateChartData"
             ></v-select>
             <div class="chart-container">
               <Bar v-if="chartData" :options="chartOptions" :data="chartData" />
@@ -168,11 +167,6 @@ export default {
 </script>
 
 <style scoped>
-.chart-container {
-  position: relative;
-  width: 100%;
-  height: 400px; /* Set a fixed height */
-}
 .card-hover {
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
@@ -180,5 +174,38 @@ export default {
   transform: translateY(-5px);
   cursor: pointer;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+/* Modern Card Styles */
+.modern-card {
+  border-radius: 15px; /* Rounded corners */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+}
+
+/* Specific Card Colors */
+.reservations-card {
+  background: linear-gradient(135deg, #5a67d8, #4c51bf); /* Blue gradient */
+}
+.cancellations-card {
+  background: linear-gradient(135deg, #e53e3e, #c53030); /* Red gradient */
+}
+.income-card {
+  background: linear-gradient(135deg, #38a169, #2f855a); /* Green gradient */
+}
+
+/* Card Text Styles */
+.headline {
+  font-size: 2em; /* Larger headline */
+  font-weight: bold; /* Bold text */
+}
+
+.subtitle-2 {
+  font-size: 1em; /* Adjust subtitle size */
+  color: #ffffff; /* Change subtitle color */
+}
+.chart-container {
+  position: relative;
+  width: 100%;
+  height: 400px; /* Set a fixed height */
 }
 </style>
