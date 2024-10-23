@@ -2,7 +2,7 @@
   <div>
     <aside :class="`${is_expanded && 'is_expanded'}`">
       <div class="logo">
-        <img src="../assets/vue.svg" class="logo vue" alt="Vue logo" />
+        <img src="https://sportma.ma/assets/sportmaApp-ERXWPjF0.jpeg" class="logo vue" alt="Vue logo" />
       </div>
       <div class="menu-toggle-wrap">
         <button class="menu-toggle" @click="ToggleMenu">
