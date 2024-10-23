@@ -83,7 +83,7 @@
   <v-dialog v-model="dialog" max-width="400px">
     <v-card>
       <!-- Title -->
-      <v-card-title class="headline">Change Status</v-card-title>
+      <v-card-title class="headline">Changer Le Statut</v-card-title>
 
       <!-- Status Selection -->
       <v-card-text>
@@ -100,18 +100,18 @@
               outline: none;
             "
           >
-            <option disabled value="disabled">Select Status</option>
-            <option value="green" data-class="green-event">🟢 Payee</option>
+            <option disabled value="disabled">Sélectionner le statut</option>
+            <option value="green" data-class="green-event">🟢 Payé</option>
             <option value="yellow" data-class="yellow-event">
               🟡 en-cours
             </option>
-            <option value="red" data-class="red-event">🔴 Annulee</option>
+            <option value="red" data-class="red-event">🔴 Annulé</option>
           </select>
         </div>
 
         <!-- Remarks Text Area for event.notes -->
         <v-textarea
-          label="Remarks"
+          label="Remarques"
           v-model="this.selectedEvent.notes"
           rows="3"
           outlined
@@ -122,9 +122,9 @@
       <!-- Actions -->
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="red darken-1" text @click="deleteEvent">Delete</v-btn>
+        <v-btn color="red darken-1" text @click="deleteEvent">Supprimer</v-btn>
         <!-- Delete Button -->
-        <v-btn color="blue darken-1" text @click="confirm">Confirm</v-btn>
+        <v-btn color="blue darken-1" text @click="confirm">Confirmer</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
