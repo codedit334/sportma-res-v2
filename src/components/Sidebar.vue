@@ -2,7 +2,11 @@
   <div>
     <aside :class="`${is_expanded && 'is_expanded'}`">
       <div class="logo">
-        <img src="https://sportma.ma/assets/sportmaApp-ERXWPjF0.jpeg" class="logo vue" alt="Vue logo" />
+        <img
+          src="https://sportma.ma/assets/sportmaApp-ERXWPjF0.jpeg"
+          class="logo vue"
+          alt="Vue logo"
+        />
       </div>
       <div class="menu-toggle-wrap">
         <button class="menu-toggle" @click="ToggleMenu">
@@ -17,11 +21,11 @@
           <span class="material-icons material-symbols-outlined">home</span>
           <span class="text">Home</span>
         </router-link>
-        <router-link class="button" to="/about">
-          <span class="material-icons material-symbols-outlined"
-            >visibility</span
-          >
-          <span class="text">About</span>
+        <router-link class="button" to="/calender">
+          <span class="material-icons material-symbols-outlined">
+            calendar_today
+          </span>
+          <span class="text">Calendrier</span>
         </router-link>
         <router-link class="button" to="/team">
           <span class="material-icons material-symbols-outlined">group</span>
