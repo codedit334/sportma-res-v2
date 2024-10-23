@@ -55,12 +55,10 @@
         <v-card class="mt-4">
           <v-card-title>Reservations Overview</v-card-title>
           <v-card-text>
-            <v-select
-              v-model="selectedTimeFrame"
-              :items="timeFrameOptions"
-              label="Select Time Frame"
-              @change="updateChartData"
-            ></v-select>
+            
+            <select v-model="selectedTimeFrame" @change="updateChartData" style="width: 100%; height: 50px; background-color: #f5f5f5;padding: 10px">
+              <option v-for="option in timeFrameOptions" :key="option">{{ option }}</option>
+            </select>
             <div class="chart-container">
               <Bar v-if="chartData" :options="chartOptions" :data="chartData" />
             </div>
@@ -123,8 +121,8 @@ export default {
     };
   },
   methods: {
-    updateChartData() {
-      console.log("Selected Time Frame:", this.selectedTimeFrame);
+    updateChartData(event) {
+      this.selectedTimeFrame = event.target.value;
       // Update chart data based on selected time frame
       if (this.selectedTimeFrame === "days") {
         this.chartData = {
