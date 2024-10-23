@@ -82,13 +82,23 @@
 
   <v-dialog v-model="dialog" max-width="400px">
     <v-card>
+      <!-- Title -->
       <v-card-title class="headline">Change Status</v-card-title>
+
+      <!-- Status Selection -->
       <v-card-text>
         <div class="event-content">
           <select
             v-model="selectedStatus"
             @input="handleInput"
-            style="width: 100%; height: 50px; padding: 10px"
+            style="
+              width: 100%;
+              height: 50px;
+              padding: 10px;
+              border: 2px solid #007bff;
+              border-radius: 4px;
+              outline: none;
+            "
           >
             <option disabled value="disabled">Select Status</option>
             <option value="green" data-class="green-event">🟢 Payee</option>
@@ -98,9 +108,22 @@
             <option value="red" data-class="red-event">🔴 Annulee</option>
           </select>
         </div>
+
+        <!-- Remarks Text Area for event.notes -->
+        <v-textarea
+          label="Remarks"
+          v-model="this.selectedEvent.notes"
+          rows="3"
+          outlined
+          style="margin-top: 20px"
+        ></v-textarea>
       </v-card-text>
+
+      <!-- Actions -->
       <v-card-actions>
         <v-spacer></v-spacer>
+        <v-btn color="red darken-1" text @click="deleteEvent">Delete</v-btn>
+        <!-- Delete Button -->
         <v-btn color="blue darken-1" text @click="confirm">Confirm</v-btn>
       </v-card-actions>
     </v-card>
@@ -119,7 +142,7 @@ export default {
     return {
       timeCellHeight: 80, // Height of one hour in pixels
       now: new Date(), // Get the current time
-      selectedUser: "sportma", // Default selected user
+      selectedUser: "manager", // Default selected user
       selectedSport: "football", // Default selected sport
       events: [],
       stickySplitLabels: true,
@@ -181,10 +204,28 @@ export default {
       this.selectedStatus = "disabled";
     },
     confirm() {
-      // Handle the confirmation logic
-      console.log("Status updated to:", this.selectedStatus);
+      console.log("Selected event:", this.selectedEvent);
+
+      // Find and replace the event with the same _eid
+      const eventIndex = this.events.findIndex(
+        (event) => event._eid === this.selectedEvent._eid
+      );
+
+      if (eventIndex !== -1) {
+        // Replace the old event with the updated selectedEvent
+        this.$set(this.events, eventIndex, this.selectedEvent);
+        console.log("Event updated successfully.");
+      } else {
+        console.log("Event not found, adding new event.");
+        this.events.push(this.selectedEvent);
+      }
+
+      console.log("After updating event:", this.events);
+
+      // Close the dialog
       this.close();
     },
+
     selectStatus(value) {
       this.selectedStatus = value;
     },
