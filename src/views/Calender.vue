@@ -69,7 +69,9 @@
       @cell-click="createEventInSplit"
       @ready="scrollToCurrentTime"
       sticky-split-labels
-      :on-event-click="onEventClick"
+      :on-event-dblclick="onEventClick"
+      :overlaps-per-time-step="overlapsPerTimeStep"
+      :min-event-width="minEventWidth"
     >
       <template #split-label="{ split, view }">
         <strong :style="`color: ${split.color}`">{{ split.label }}</strong>
@@ -98,7 +100,6 @@
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="blue darken-1" text @click="close">Cancel</v-btn>
         <v-btn color="blue darken-1" text @click="confirm">Confirm</v-btn>
       </v-card-actions>
     </v-card>
@@ -123,10 +124,12 @@ export default {
       stickySplitLabels: true,
       minCellWidth: 400,
       minSplitWidth: 300,
+      minEventWidth: 100,
       splitDays: [], // To be updated based on selected sport
+      overlapsPerTimeStep: true,
       dialog: false,
       selectedEvent: null,
-      selectedStatus: null,
+      selectedStatus: "disabled",
     };
   },
   mounted() {
