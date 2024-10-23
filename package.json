@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "chart.js": "^4.4.5",
+    "uuid": "^10.0.0",
     "vue": "^3.2.47",
     "vue-cal": "^4.10.0",
     "vue-chartjs": "^5.3.1",

@@ -131,6 +131,7 @@
 </template>
 
 <script>
+import { v4 as uuidv4 } from "uuid";
 import VueCal from "vue-cal";
 import "vue-cal/dist/vuecal.css";
 
@@ -206,14 +207,14 @@ export default {
     confirm() {
       console.log("Selected event:", this.selectedEvent);
 
-      // Find and replace the event with the same _eid
+      // Find and replace the event with the same id
       const eventIndex = this.events.findIndex(
-        (event) => event._eid === this.selectedEvent._eid
+        (event) => event.id === this.selectedEvent.id
       );
 
       if (eventIndex !== -1) {
         // Replace the old event with the updated selectedEvent
-        this.$set(this.events, eventIndex, this.selectedEvent);
+        this.events[eventIndex] = { ...this.selectedEvent }; // Spread syntax to replace the object
         console.log("Event updated successfully.");
       } else {
         console.log("Event not found, adding new event.");
@@ -221,6 +222,28 @@ export default {
       }
 
       console.log("After updating event:", this.events);
+
+      // Close the dialog
+      this.close();
+    },
+
+    deleteEvent() {
+      console.log("Selected event:", this.selectedEvent);
+
+      // Find the index of the event with the same id
+      const eventIndex = this.events.findIndex(
+        (event) => event.id === this.selectedEvent.id
+      );
+
+      if (eventIndex !== -1) {
+        // Remove the event from the array
+        this.events.splice(eventIndex, 1);
+        console.log("Event deleted successfully.");
+      } else {
+        console.log("Event not found, could not delete.");
+      }
+
+      console.log("After deleting event:", this.events);
 
       // Close the dialog
       this.close();
@@ -312,6 +335,7 @@ export default {
         }
 
         this.$refs.vuecal2.createEvent(event.date, 60, {
+          id: uuidv4(),
           title: `Nouvelle Reservation`,
           class: eventClass,
           content: eventContent,
