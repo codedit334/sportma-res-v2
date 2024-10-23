@@ -69,12 +69,33 @@
       @cell-click="createEventInSplit"
       @ready="scrollToCurrentTime"
       sticky-split-labels
+      :on-event-click="onEventClick"
     >
       <template #split-label="{ split, view }">
         <strong :style="`color: ${split.color}`">{{ split.label }}</strong>
       </template>
     </vue-cal>
   </div>
+
+  <v-dialog v-model="dialog" max-width="400px">
+    <v-card>
+      <v-card-title class="headline">Change Status</v-card-title>
+      <v-card-text>
+        <div class="event-content">
+          <select @input="handleInput" style="width: 100%; height: 50px">
+            <option value="green" data-class="green-event">🟢 Payee</option>
+            <option value="yellow" data-class="yellow-event">🟡 en-cours</option>
+            <option value="red" data-class="red-event">🔴 Annulee</option>
+          </select>
+        </div>
+      </v-card-text>
+      <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-btn color="blue darken-1" text @click="close">Cancel</v-btn>
+        <v-btn color="blue darken-1" text @click="confirm">Confirm</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 </template>
 
 <script>
@@ -96,12 +117,38 @@ export default {
       minCellWidth: 400,
       minSplitWidth: 300,
       splitDays: [], // To be updated based on selected sport
+      dialog: false,
+      selectedEvent: null,
+      selectedStatus: null,
     };
   },
   mounted() {
     this.updateSplitDays(); // Initialize splitDays on mount
   },
   methods: {
+    handleInput(event) {
+      this.selectedStatus = event.target.value;
+      this.selectedEvent.class = event.target.value + "-event";
+      console.log("Input value:", event.target.value);
+    },
+    open() {
+      this.dialog = true;
+    },
+    close() {
+      this.dialog = false;
+    },
+    confirm() {
+      // Handle the confirmation logic
+      console.log("Status updated to:", this.selectedStatus);
+      this.close();
+    },
+    selectStatus(value) {
+      this.selectedStatus = value;
+    },
+    updateStatus() {
+      // This method can be used if you want to react to changes in the select input
+      console.log("Selected status changed to:", this.selectedStatus);
+    },
     updateSplitDays() {
       if (this.selectedSport === "football") {
         this.splitDays = [
@@ -160,19 +207,24 @@ export default {
     },
     createEventInSplit(event) {
       if (event.split) {
-        let eventClass =
-          this.selectedUser === "sportma" ? "blue-event" : "green-event";
+        let eventClass = "";
+        let eventContent = "";
+
         // Conditional content based on user type
-        let eventContent =
-          this.selectedUser === "sportma"
-            ? `
-                <div class="event-content">
-                    <img src="https://sportma.ma/assets/sportmaApp-ERXWPjF0.jpeg" width="30" class="event-icon" alt="Icon" />
-                </div>
-            `
-            : `
-                <span>Nouvelle Reservation</span>
-            `; // Only text for other users
+        if (this.selectedUser === "sportma") {
+          eventClass = "blue-event";
+          eventContent = `
+        <div class="event-content">
+          <img src="https://sportma.ma/assets/sportmaApp-ERXWPjF0.jpeg" width="30" class="event-icon" alt="Icon" />
+        </div>
+      `;
+        } else if (this.selectedUser === "manager") {
+          eventClass = "yellow-event"; // Default class for manager
+        } else {
+          eventClass = "green-event"; // Default class for other users
+          eventContent = `<span>Nouvelle Reservation</span>`;
+        }
+
         this.$refs.vuecal2.createEvent(event.date, 60, {
           title: `Nouvelle Reservation`,
           class: eventClass,
@@ -181,7 +233,24 @@ export default {
         });
       }
     },
+    changeEventClass(selectElement) {
+      console.log("Working");
+      const selectedOption = selectElement.options[selectElement.selectedIndex];
+      const selectedClass = selectedOption.getAttribute("data-class");
+      const eventElement = selectElement.closest(".vue-cal-event"); // Adjust selector based on your actual DOM structure
 
+      if (eventElement) {
+        // Update the event class
+        eventElement.className = eventElement.className.replace(
+          /(green-event|yellow-event|red-event)/,
+          selectedClass
+        );
+      }
+    },
+    onEventClick(event, e) {
+      this.selectedEvent = event;
+      this.open();
+    },
     scrollToCurrentTime() {
       // Access the calendar's scrollable background
       const calendar = this.$refs.vuecal2.$el.querySelector(".vuecal__bg");
@@ -238,6 +307,16 @@ export default {
 
 .green-event {
   background-color: lightgreen;
+  color: white;
+}
+
+.red-event {
+  background-color: red;
+  color: white;
+}
+
+.yellow-event {
+  background-color: #d6c32f;
   color: white;
 }
 
