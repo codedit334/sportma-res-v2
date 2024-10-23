@@ -82,9 +82,16 @@
       <v-card-title class="headline">Change Status</v-card-title>
       <v-card-text>
         <div class="event-content">
-          <select @input="handleInput" style="width: 100%; height: 50px">
+          <select
+            v-model="selectedStatus"
+            @input="handleInput"
+            style="width: 100%; height: 50px; padding: 10px"
+          >
+            <option disabled value="disabled">Select Status</option>
             <option value="green" data-class="green-event">🟢 Payee</option>
-            <option value="yellow" data-class="yellow-event">🟡 en-cours</option>
+            <option value="yellow" data-class="yellow-event">
+              🟡 en-cours
+            </option>
             <option value="red" data-class="red-event">🔴 Annulee</option>
           </select>
         </div>
@@ -136,6 +143,7 @@ export default {
     },
     close() {
       this.dialog = false;
+      this.selectedStatus = "disabled";
     },
     confirm() {
       // Handle the confirmation logic
@@ -208,6 +216,7 @@ export default {
     createEventInSplit(event) {
       if (event.split) {
         let eventClass = "";
+        let clickable = false;
         let eventContent = "";
 
         // Conditional content based on user type
@@ -220,9 +229,10 @@ export default {
       `;
         } else if (this.selectedUser === "manager") {
           eventClass = "yellow-event"; // Default class for manager
+          clickable = true;
         } else {
           eventClass = "green-event"; // Default class for other users
-          eventContent = `<span>Nouvelle Reservation</span>`;
+          clickable = true;
         }
 
         this.$refs.vuecal2.createEvent(event.date, 60, {
@@ -230,6 +240,7 @@ export default {
           class: eventClass,
           content: eventContent,
           split: event.split,
+          clickable: clickable,
         });
       }
     },
@@ -248,8 +259,10 @@ export default {
       }
     },
     onEventClick(event, e) {
-      this.selectedEvent = event;
-      this.open();
+      if (event.clickable === true) {
+        this.selectedEvent = event;
+        this.open();
+      }
     },
     scrollToCurrentTime() {
       // Access the calendar's scrollable background
