@@ -171,14 +171,11 @@ export default {
       console.log(event, data);
     },
     isOverlapping(newEvent) {
-      console.log("Checking if newEvent is overlapping:", newEvent);
       return this.events.some((event) => {
         // Exclude the newEvent itself by comparing IDs (or other unique properties)
         if (event.id === newEvent.event.id) {
           return false; // Skip the current newEvent in the comparison
         }
-
-        console.log("Checking against event:", event);
 
         // Create a range for the existing event
         const existingEventRange = momentRange.range(
@@ -192,7 +189,6 @@ export default {
           moment(newEvent.event.end)
         );
 
-        console.log("Boolean", newEventRange.overlaps(existingEventRange));
         // Check if the ranges overlap
         return newEventRange.overlaps(existingEventRange);
       });
@@ -200,13 +196,52 @@ export default {
 
     dropEvent(newEvent) {
       console.log("Drop event:", newEvent);
-      if (this.isOverlapping(newEvent)) {
+      console.log("Events:", this.events);
+
+      // Check for overlapping only if event.split and newEvent.newSplit are the same
+      const isOverlap = this.events.some((event) => {
+        if (event.split === newEvent.newSplit) {
+          return this.isOverlapping(newEvent, event);
+        } else return false;
+      });
+
+      if (isOverlap) {
         alert(
-          "This event overlaps with an existing event. Please choose a different time."
+          "This event overlaps with an existing event in the same split. Please choose a different time."
         );
+        this.addEventToEvents(newEvent);
         return;
       }
-      this.events.push(newEvent.event);
+    },
+
+    addEventToEvents(eventObj) {
+      // Clone the event object to avoid modifying the original
+      const newEvent = { ...eventObj.originalEvent };
+
+      // Set the start to the oldDate as a Date object
+      newEvent.start = new Date(eventObj.oldDate);
+
+      // Calculate the end by adding the duration (in minutes) to the start
+      newEvent.end = new Date(
+        newEvent.start.getTime() + newEvent.duration * 60000
+      ); // 60000 ms in a minute
+
+      // Find the index of the existing event by ID
+      const eventIndex = this.events.findIndex(
+        (event) => event.id === newEvent.id
+      );
+
+      if (eventIndex !== -1) {
+        // If the event exists, directly replace it in the array
+        this.events[eventIndex] = newEvent;
+      } else {
+        // If the event does not exist, add it to the events array
+        this.events.push(newEvent);
+      }
+
+      console.log("All events:", this.events);
+
+      console.log("Updated event:", newEvent);
     },
     onEventCreate(newEvent) {
       // Adjust start and end times to nearest 30-minute interval
