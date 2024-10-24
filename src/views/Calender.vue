@@ -170,6 +170,30 @@ export default {
     logEvents(event, data) {
       console.log(event, data);
     },
+    checkForCreationOverlapping(newEvent) {
+      const newEventStart = moment(newEvent.date);
+      const newEventEnd = moment(newEvent.date).add(1, "hour"); // assuming duration is 1 hour, adjust this as needed
+
+      const newEventRange = momentRange.range(newEventStart, newEventEnd);
+
+      const isOverlap = this.events.some((event) => {
+        // Check if the event is in the same split
+        if (event.split === newEvent.split) {
+          const existingEventStart = moment(event.start);
+          const existingEventEnd = moment(event.end);
+          const existingEventRange = momentRange.range(
+            existingEventStart,
+            existingEventEnd
+          );
+
+          // Check if the new event overlaps with any existing event
+          return newEventRange.overlaps(existingEventRange);
+        }
+        return false; // No overlap if in different splits
+      });
+
+      return isOverlap;
+    },
     isOverlapping(newEvent) {
       return this.events.some((event) => {
         // Exclude the newEvent itself by comparing IDs (or other unique properties)
@@ -189,12 +213,6 @@ export default {
           moment(newEvent.event.end)
         );
 
-        console.log("Compare io");
-        console.log("id", event.id, "id", newEvent.event.id);
-        console.log("start", event, "start", newEvent.event);
-        console.log("end", event.end, "end", newEvent.event.end);
-        console.log("Compare io");
-
         if (event.split === newEvent.event.split) {
           // Check if the ranges overlap
           return newEventRange.overlaps(existingEventRange);
@@ -203,15 +221,12 @@ export default {
     },
 
     dropEvent(newEvent) {
-      console.log("all events", this.events);
       // Check for overlapping only if event.split and newEvent.newSplit are the same
       const isOverlap = this.events.some((event) => {
         // Exclude the newEvent by comparing unique identifiers
         if (event.id !== newEvent.event.id) {
           // Check for overlapping only if the split values match
           if (event.split === newEvent.newSplit) {
-            console.log(event.start, event.split, newEvent.newSplit);
-            console.log("new event", newEvent);
             return this.isOverlapping(newEvent, event);
           } else return false;
         }
@@ -391,43 +406,46 @@ export default {
       }
     },
     createEventInSplit(event) {
-      if (event.split) {
-        let eventClass = "";
-        let clickable = false;
-        let eventContent = "";
-        let duration = 60; // Default duration
+      // Check if event is overlapping events in the same split
+      if (!this.checkForCreationOverlapping(event)) {
+        if (event.split) {
+          let eventClass = "";
+          let clickable = false;
+          let eventContent = "";
+          let duration = 60; // Default duration
 
-        // Check if event.split contains the word "padel"
-        if (event.split.toLowerCase().includes("padel")) {
-          duration = 90; // Set duration to 90 if "padel" is found
-        }
+          // Check if event.split contains the word "padel"
+          if (event.split.toLowerCase().includes("padel")) {
+            duration = 90; // Set duration to 90 if "padel" is found
+          }
 
-        // Conditional content based on user type
-        if (this.selectedUser === "sportma") {
-          eventClass = "blue-event";
-          eventContent = `
+          // Conditional content based on user type
+          if (this.selectedUser === "sportma") {
+            eventClass = "blue-event";
+            eventContent = `
         <div class="event-content">
           <img src="https://sportma.ma/assets/sportmaApp-ERXWPjF0.jpeg" width="30" class="event-icon" alt="Icon" />
         </div>
       `;
-        } else if (this.selectedUser === "manager") {
-          eventClass = "yellow-event"; // Default class for manager
-          clickable = true;
-        } else {
-          eventClass = "green-event"; // Default class for other users
-          clickable = true;
-        }
+          } else if (this.selectedUser === "manager") {
+            eventClass = "yellow-event"; // Default class for manager
+            clickable = true;
+          } else {
+            eventClass = "green-event"; // Default class for other users
+            clickable = true;
+          }
 
-        this.$refs.vuecal2.createEvent(event.date, duration, {
-          id: uuidv4(),
-          title: `Nouvelle Reservation`,
-          class: eventClass,
-          content: eventContent,
-          split: event.split,
-          clickable: clickable,
-          duration: duration,
-        });
-      }
+          this.$refs.vuecal2.createEvent(event.date, duration, {
+            id: uuidv4(),
+            title: `Nouvelle Reservation`,
+            class: eventClass,
+            content: eventContent,
+            split: event.split,
+            clickable: clickable,
+            duration: duration,
+          });
+        }
+      } else alert("This event overlaps with an existing event in the same split.");
     },
     changeEventClass(selectElement) {
       const selectedOption = selectElement.options[selectElement.selectedIndex];
