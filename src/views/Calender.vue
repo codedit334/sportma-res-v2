@@ -66,7 +66,7 @@
       :events="events"
       :split-days="splitDays"
       :min-cell-width="minCellWidth"
-      @cell-click="createEventInSplit"
+      @cell-dblclick="createEventInSplit"
       @ready="scrollToCurrentTime"
       sticky-split-labels
       :on-event-dblclick="onEventClick"
@@ -171,8 +171,13 @@ export default {
       console.log(event, data);
     },
     checkForCreationOverlapping(newEvent) {
+      let duration = 60; // Default duration
       const newEventStart = moment(newEvent.date);
-      const newEventEnd = moment(newEvent.date).add(1, "hour"); // assuming duration is 1 hour, adjust this as needed
+      // Check if event.split contains the word "padel"
+      if (newEvent.split.toLowerCase().includes("padel")) {
+        duration = 90;
+      }
+      const newEventEnd = moment(newEvent.date).add(duration, "minute"); // assuming duration is 1 hour, adjust this as needed
 
       const newEventRange = momentRange.range(newEventStart, newEventEnd);
 
@@ -445,7 +450,7 @@ export default {
             duration: duration,
           });
         }
-      } else alert("This event overlaps with an existing event in the same split.");
+      }
     },
     changeEventClass(selectElement) {
       const selectedOption = selectElement.options[selectElement.selectedIndex];
