@@ -73,6 +73,7 @@
       :overlaps-per-time-step="overlapsPerTimeStep"
       :min-event-width="minEventWidth"
       @event-create="onEventCreate"
+      @event-drop="dropEvent"
     >
       <template #split-label="{ split, view }">
         <strong :style="`color: ${split.color}`">{{ split.label }}</strong>
@@ -133,7 +134,12 @@
 <script>
 import { v4 as uuidv4 } from "uuid";
 import VueCal from "vue-cal";
+import moment from "moment";
+import { extendMoment } from "moment-range";
+
 import "vue-cal/dist/vuecal.css";
+
+const momentRange = extendMoment(moment);
 
 export default {
   components: {
@@ -163,6 +169,44 @@ export default {
   methods: {
     logEvents(event, data) {
       console.log(event, data);
+    },
+    isOverlapping(newEvent) {
+      console.log("Checking if newEvent is overlapping:", newEvent);
+      return this.events.some((event) => {
+        // Exclude the newEvent itself by comparing IDs (or other unique properties)
+        if (event.id === newEvent.event.id) {
+          return false; // Skip the current newEvent in the comparison
+        }
+
+        console.log("Checking against event:", event);
+
+        // Create a range for the existing event
+        const existingEventRange = momentRange.range(
+          moment(event.start),
+          moment(event.end)
+        );
+
+        // Create a range for the new event
+        const newEventRange = momentRange.range(
+          moment(newEvent.event.start),
+          moment(newEvent.event.end)
+        );
+
+        console.log("Boolean", newEventRange.overlaps(existingEventRange));
+        // Check if the ranges overlap
+        return newEventRange.overlaps(existingEventRange);
+      });
+    },
+
+    dropEvent(newEvent) {
+      console.log("Drop event:", newEvent);
+      if (this.isOverlapping(newEvent)) {
+        alert(
+          "This event overlaps with an existing event. Please choose a different time."
+        );
+        return;
+      }
+      this.events.push(newEvent.event);
     },
     onEventCreate(newEvent) {
       // Adjust start and end times to nearest 30-minute interval
@@ -347,6 +391,7 @@ export default {
           content: eventContent,
           split: event.split,
           clickable: clickable,
+          duration: duration,
         });
       }
     },
