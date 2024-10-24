@@ -195,14 +195,15 @@ export default {
     },
 
     dropEvent(newEvent) {
-      console.log("Drop event:", newEvent);
-      console.log("Events:", this.events);
-
       // Check for overlapping only if event.split and newEvent.newSplit are the same
       const isOverlap = this.events.some((event) => {
-        if (event.split === newEvent.newSplit) {
-          return this.isOverlapping(newEvent, event);
-        } else return false;
+        // Exclude the newEvent by comparing unique identifiers (e.g., _eid)
+        if (event.id !== newEvent.event.id) {
+          // Check for overlapping only if the split values match
+          if (event.split === newEvent.newSplit) {
+            return this.isOverlapping(newEvent, event);
+          } else return false;
+        }
       });
 
       if (isOverlap) {
@@ -212,9 +213,22 @@ export default {
         this.addEventToEvents(newEvent);
         return;
       }
+      // Replace the event in events array with newEvent.event if they have the same id
+      this.events = this.events.map((event) => {
+        if (event.id === newEvent.event.id) {
+          return newEvent.event;
+        } else {
+          return event;
+        }
+      });
     },
 
     addEventToEvents(eventObj) {
+      // Delete the event with the same id as eventObj.event.id from the events array
+      this.events = this.events.filter(
+        (event) => event.id !== eventObj.event.id
+      );
+
       // Clone the event object to avoid modifying the original
       const newEvent = { ...eventObj.originalEvent };
 
@@ -226,22 +240,8 @@ export default {
         newEvent.start.getTime() + newEvent.duration * 60000
       ); // 60000 ms in a minute
 
-      // Find the index of the existing event by ID
-      const eventIndex = this.events.findIndex(
-        (event) => event.id === newEvent.id
-      );
-
-      if (eventIndex !== -1) {
-        // If the event exists, directly replace it in the array
-        this.events[eventIndex] = newEvent;
-      } else {
-        // If the event does not exist, add it to the events array
-        this.events.push(newEvent);
-      }
-
-      console.log("All events:", this.events);
-
-      console.log("Updated event:", newEvent);
+      // Add the new event to the events array
+      this.events.push(newEvent);
     },
     onEventCreate(newEvent) {
       // Adjust start and end times to nearest 30-minute interval
@@ -274,7 +274,6 @@ export default {
     handleInput(event) {
       this.selectedStatus = event.target.value;
       this.selectedEvent.class = event.target.value + "-event";
-      console.log("Input value:", event.target.value);
     },
     open() {
       this.dialog = true;
@@ -284,8 +283,6 @@ export default {
       this.selectedStatus = "disabled";
     },
     confirm() {
-      console.log("Selected event:", this.selectedEvent);
-
       // Find and replace the event with the same id
       const eventIndex = this.events.findIndex(
         (event) => event.id === this.selectedEvent.id
@@ -294,21 +291,15 @@ export default {
       if (eventIndex !== -1) {
         // Replace the old event with the updated selectedEvent
         this.events[eventIndex] = { ...this.selectedEvent }; // Spread syntax to replace the object
-        console.log("Event updated successfully.");
       } else {
-        console.log("Event not found, adding new event.");
         this.events.push(this.selectedEvent);
       }
-
-      console.log("After updating event:", this.events);
 
       // Close the dialog
       this.close();
     },
 
     deleteEvent() {
-      console.log("Selected event:", this.selectedEvent);
-
       // Find the index of the event with the same id
       const eventIndex = this.events.findIndex(
         (event) => event.id === this.selectedEvent.id
@@ -317,12 +308,9 @@ export default {
       if (eventIndex !== -1) {
         // Remove the event from the array
         this.events.splice(eventIndex, 1);
-        console.log("Event deleted successfully.");
       } else {
         console.log("Event not found, could not delete.");
       }
-
-      console.log("After deleting event:", this.events);
 
       // Close the dialog
       this.close();
@@ -431,7 +419,6 @@ export default {
       }
     },
     changeEventClass(selectElement) {
-      console.log("Working");
       const selectedOption = selectElement.options[selectElement.selectedIndex];
       const selectedClass = selectedOption.getAttribute("data-class");
       const eventElement = selectElement.closest(".vue-cal-event"); // Adjust selector based on your actual DOM structure
