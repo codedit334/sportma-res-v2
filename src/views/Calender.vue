@@ -189,18 +189,29 @@ export default {
           moment(newEvent.event.end)
         );
 
-        // Check if the ranges overlap
-        return newEventRange.overlaps(existingEventRange);
+        console.log("Compare io");
+        console.log("id", event.id, "id", newEvent.event.id);
+        console.log("start", event, "start", newEvent.event);
+        console.log("end", event.end, "end", newEvent.event.end);
+        console.log("Compare io");
+
+        if (event.split === newEvent.event.split) {
+          // Check if the ranges overlap
+          return newEventRange.overlaps(existingEventRange);
+        } else return false;
       });
     },
 
     dropEvent(newEvent) {
+      console.log("all events", this.events);
       // Check for overlapping only if event.split and newEvent.newSplit are the same
       const isOverlap = this.events.some((event) => {
-        // Exclude the newEvent by comparing unique identifiers (e.g., _eid)
+        // Exclude the newEvent by comparing unique identifiers
         if (event.id !== newEvent.event.id) {
           // Check for overlapping only if the split values match
           if (event.split === newEvent.newSplit) {
+            console.log(event.start, event.split, newEvent.newSplit);
+            console.log("new event", newEvent);
             return this.isOverlapping(newEvent, event);
           } else return false;
         }
